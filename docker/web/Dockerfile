@@ -2,7 +2,7 @@ FROM php:7.2.7-apache
 
 # Install build dependencies, e.g. composer, system libs
 RUN apt-get update 1> /dev/null \
-    && apt-get install -y git zip unzip libgd3 \ 
+    && apt-get install -y git zip unzip libgd3 \
         libpng-dev libwebp-dev libjpeg62-turbo-dev libxpm-dev libfreetype6-dev 1> /dev/null \
     && php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer \
     && apt-get -y autoremove 1> /dev/null \
@@ -16,7 +16,12 @@ RUN pecl install mongodb-1.5.1 1> /dev/null \
     && docker-php-ext-enable mongodb \
     && docker-php-ext-install bcmath exif gd 1> /dev/null
 
-WORKDIR /var/www/app
-
 COPY ./docker/web/vhost.conf /etc/apache2/sites-available/000-default.conf
 COPY ./docker/web/inventory-php.ini /usr/local/etc/php/conf.d/inventory-php.ini
+
+COPY . /var/www/app
+
+RUN chown www-data:www-data /var/www/app/data/images
+
+WORKDIR /var/www/app
+RUN composer install

@@ -6,11 +6,15 @@ services:
       dockerfile: docker/web/Dockerfile
     image: personal-inventory
     ports:
-      - 80:80
+      - 8080:80
     volumes:
-      - .:/var/www/app
+      - app:/var/www/app
 
   mongodb:
-    image: mongo:4.0.0
+    image: mongo:4
     volumes:
-      - ./data/db:/data/db
+      - mongodb:/data/db
+
+volumes:
+  app:
+  mongodb:

@@ -1,8 +1,8 @@
 {
-    "name": "Personal Inventory",
+    "name": "wipash/personal-inventory",
     "description": "Personal inventory management system",
     "type": "project",
-    "license": "proprietary",
+    "license": "MIT",
     "require": {
         "php": "^7.2.0",
         "ext-iconv": "*",
