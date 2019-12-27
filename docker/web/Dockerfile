@@ -24,4 +24,4 @@ COPY . /var/www/app
 RUN chown www-data:www-data /var/www/app/data/images
 
 WORKDIR /var/www/app
-RUN composer install
+RUN php -d memory_limit=-1 `which composer` install
