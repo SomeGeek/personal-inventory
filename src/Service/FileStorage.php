@@ -48,8 +48,11 @@ class FileStorage
             if (!$extension) {
                 $extension = 'bin';
             }
-            $originalFilename = $time . 'f' . $count . '.' . $extension;
-            $file->move($itemPath, $originalFilename);
+            $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeFilename = \transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
+            $newFilename = $safeFilename.'-'.$time.$count.'.' . $extension;
+            //$originalFilename = $time . 'f' . $count . '.' . $extension;
+            $file->move($itemPath, $newFilename);
             $count++;
         }
     }
