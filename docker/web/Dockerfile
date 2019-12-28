@@ -1,4 +1,4 @@
-FROM php:7.2.7-apache
+FROM php:7.3-apache
 
 # Install build dependencies, e.g. composer, system libs
 RUN apt-get update 1> /dev/null \
@@ -23,7 +23,10 @@ COPY ./docker/web/inventory-php.ini /usr/local/etc/php/conf.d/inventory-php.ini
 
 COPY . /var/www/app
 
-RUN chown www-data:www-data -R /var/www/app/data
+RUN mkdir -p /var/www/app/data \
+    && mkdir -p /var/www/app/var/log \
+    && mkdir -p /var/www/app/var/cache \
+    && chmod 777 -R /var/www/app/data /var/www/app/var/log /var/www/app/var/cache
 
 WORKDIR /var/www/app
 RUN php -d memory_limit=-1 `which composer` install
