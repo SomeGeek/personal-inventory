@@ -8,9 +8,6 @@ use App\Entity\InventoryItem;
 
 class FileStorage
 {
-    const WIDTH_SMALL = 200;
-    const HEIGHT_SMALL = 200;
-
     /** @var string */
     protected $basePath;
 
@@ -51,7 +48,7 @@ class FileStorage
             if (!$extension) {
                 $extension = 'bin';
             }
-            $originalFilename = $time . 'i' . $count . '.' . $extension;
+            $originalFilename = $time . 'f' . $count . '.' . $extension;
             $file->move($itemPath, $originalFilename);
             $count++;
         }

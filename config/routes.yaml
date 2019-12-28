@@ -22,7 +22,7 @@ inventory_image:
     controller: App\Controller\Inventory::image
 inventory_file:
     path: /inventory/{id}/files/{filename}
-    controller: App\Controller\Inventory::file
+    controller: App\Controller\Inventory::itemfile
 
 tag_list:
     path: /tags/{category}

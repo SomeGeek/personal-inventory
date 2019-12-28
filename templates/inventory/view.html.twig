@@ -10,7 +10,7 @@
                 {% if currency %}
                     <td>{{ data|localizedcurrency('USD') }}</td>
                 {% else %}
-                    <td>{{ data }}</td>                
+                    <td>{{ data }}</td>
                 {% endif %}
             </tr>
         {% endif %}
@@ -54,6 +54,16 @@
                             <a href="{{ path('inventory_image', {'id': item.id, 'filename': filename}) }}">
                                 <img src="{{ path('inventory_image', {'id': item.id, 'filename': filename}) }}?w=200">
                             </a>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+            {% if files %}
+                <tr>
+                    <th scope="row">Files</th>
+                    <td>
+                        {% for filename in files %}
+                            <a href="{{ path('inventory_file', {'id': item.id, 'filename': filename}) }}">{{ filename }}</a>
                         {% endfor %}
                     </td>
                 </tr>

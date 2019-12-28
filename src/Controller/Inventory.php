@@ -293,4 +293,27 @@ class Inventory extends Controller
             }
         }
     }
+
+    /**
+     * GET file content; POST to delete
+     *
+     */
+    public function itemfile(Request $request, $id, $filename)
+    {
+        $item = $this->docs->getInventoryItem($id);
+        if (!$item) {
+            throw $this->createNotFoundException('Item not found');
+        }
+        if ($request->getMethod() === 'POST' && $request->request->get['action'] === 'delete') {
+            $this->files->deleteItemFile($item, $filename);
+            return new JsonResponse(['success' => 1]);
+        } else {
+            $path = $this->files->getFilePath($item, $filename);
+            if (file_exists($path)) {
+                return new BinaryFileResponse($path, Response::HTTP_OK, ['Cache-Control' => 'max-age=14400']);
+            } else {
+                throw $this->createNotFoundException('File not found');
+            }
+        }
+    }
 }

@@ -21,7 +21,7 @@ COPY ./docker/web/inventory-php.ini /usr/local/etc/php/conf.d/inventory-php.ini
 
 COPY . /var/www/app
 
-RUN chown www-data:www-data /var/www/app/data/images
+RUN chown www-data:www-data -R /var/www/app/data
 
 WORKDIR /var/www/app
 RUN php -d memory_limit=-1 `which composer` install
