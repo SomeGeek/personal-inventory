@@ -1,81 +1,98 @@
 <?php
 
-namespace App\Entity;
+namespace App\Document;
 
-class InventoryItem extends Persistable
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use App\Repository\InventoryItemRepository;
+
+/**
+ * @MongoDB\Document(repositoryClass=InventoryItemRepository::class)
+ */
+class InventoryItem
 {
-    /** @var string */
+
+    /**
+     * @MongoDB\Id
+     */
+    protected $id;
+
+    /** @MongoDB\Field(type="string") */
     protected $name;
 
-    /** @var string */
+    /** @MongoDB\Field(type="string") */
     protected $manufacturer;
 
-    /** @var string */
+    /** @MongoDB\Field(type="string") */
     protected $model;
 
-    /** @var string */
+    /** @MongoDB\Field(type="string") */
     protected $serialNumbers;
 
-    /** @var string */
+    /** @MongoDB\Field(type="string") */
     protected $notes;
 
-    /** @var string[] */
+    /** @MongoDB\Field(type="collection") */
     protected $locations = [];
 
-    /** @var string[] */
+    /** @MongoDB\Field(type="collection") */
     protected $types = [];
 
-    /** @var string */
+    /** @MongoDB\Field(type="string") */
     protected $purchasePrice;
 
-    /** @var string Individual item value */
+    /** @MongoDB\Field(type="string") */
     protected $value;
 
-    /** @var int */
+    /** @MongoDB\Field(type="int") */
     protected $quantity = 1;
 
-    /** @var int */
+    /** @MongoDB\Field(type="int") */
     protected $acquiredDate;
 
-    /** @var bool Soft delete */
+    /** @MongoDB\Field(type="bool") */
     protected $deleted = false;
 
-    public function setName(string $name) 
+    public function getId(): string
+    {
+        return (string) $this->id;
+    }
+
+    public function setName(string $name)
     {
         $this->name = $name;
     }
 
-    public function getName() : ?string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function setManufacturer(string $manufacturer) 
+    public function setManufacturer(string $manufacturer)
     {
         $this->manufacturer = $manufacturer;
     }
 
-    public function getManufacturer() : ?string
+    public function getManufacturer(): ?string
     {
         return $this->manufacturer;
     }
 
-    public function setModel(string $model) 
+    public function setModel(string $model)
     {
         $this->model = $model;
     }
 
-    public function getModel() : ?string
+    public function getModel(): ?string
     {
         return $this->model;
     }
 
-    public function setSerialNumbers(string $serialNumbers) 
+    public function setSerialNumbers(string $serialNumbers)
     {
         $this->serialNumbers = $serialNumbers;
     }
 
-    public function getSerialNumbers() : ?string
+    public function getSerialNumbers(): ?string
     {
         return $this->serialNumbers;
     }
@@ -85,24 +102,24 @@ class InventoryItem extends Persistable
         $this->notes = $notes;
     }
 
-    public function getNotes() : ?string
+    public function getNotes(): ?string
     {
         return $this->notes;
     }
 
     /**
      * Add one location to the set of locations
-     * 
+     *
      * @param string $location
      */
-    public function addLocation(string $location) 
+    public function addLocation(string $location)
     {
         $this->locations[] = $location;
     }
 
     /**
      * Set all locations
-     * 
+     *
      * @param string[] $locations
      * @throws \RuntimeException
      */
@@ -118,31 +135,31 @@ class InventoryItem extends Persistable
 
     /**
      * Get all locations associated with this item
-     * 
+     *
      * @return string[]
      */
-    public function getLocations() : array
+    public function getLocations(): array
     {
         return $this->locations;
     }
 
     /**
      * Add one type to the set of types
-     * 
+     *
      * @param string $type
      */
-    public function addType(string $type) 
+    public function addType(string $type)
     {
         $this->types[] = $type;
     }
 
     /**
      * Set all types for this item
-     * 
+     *
      * @param string[] $types
      * @throws \RuntimeException
      */
-    public function setTypes(array $types) 
+    public function setTypes(array $types)
     {
         foreach ($types as $type) {
             if (is_object($type)) {
@@ -154,10 +171,10 @@ class InventoryItem extends Persistable
 
     /**
      * Get all types (as strings) associated with this item
-     * 
+     *
      * @return string[]
      */
-    public function getTypes() : array
+    public function getTypes(): array
     {
         return $this->types;
     }
@@ -174,17 +191,17 @@ class InventoryItem extends Persistable
         $this->purchasePrice = $price;
     }
 
-    public function getPurchasePrice() : ?string
+    public function getPurchasePrice(): ?string
     {
         return $this->purchasePrice;
     }
 
     /**
      * Get total purchase price (individual price * quantity)
-     * 
+     *
      * @return string|null
      */
-    public function getTotalPurchasePrice() : ?string
+    public function getTotalPurchasePrice(): ?string
     {
         $price = null;
         if ($this->purchasePrice && $this->quantity) {
@@ -196,7 +213,7 @@ class InventoryItem extends Persistable
 
     /**
      * Set the individual value of an item
-     * 
+     *
      * @param string $value
      * @throws \RuntimeException
      */
@@ -208,17 +225,17 @@ class InventoryItem extends Persistable
         $this->value = $value;
     }
 
-    public function getValue() : ?string
+    public function getValue(): ?string
     {
         return $this->value;
     }
 
     /**
      * Get total value (individual value * quantity)
-     * 
+     *
      * @return string|null
      */
-    public function getTotalValue() : ?string
+    public function getTotalValue(): ?string
     {
         $value = null;
         if ($this->value && $this->quantity) {
@@ -233,7 +250,7 @@ class InventoryItem extends Persistable
         $this->quantity = $quantity;
     }
 
-    public function getQuantity() : int
+    public function getQuantity(): int
     {
         return $this->quantity;
     }
@@ -247,7 +264,7 @@ class InventoryItem extends Persistable
         }
     }
 
-    public function getAcquiredDate() : ?\DateTime
+    public function getAcquiredDate(): ?\DateTime
     {
         if ($this->acquiredDate) {
             return new \DateTime('@' . $this->acquiredDate);
@@ -261,7 +278,7 @@ class InventoryItem extends Persistable
         $this->deleted = $deleted;
     }
 
-    public function isDeleted() : boolean
+    public function isDeleted(): bool
     {
         return $this->deleted;
     }

@@ -4,7 +4,7 @@ namespace App\Service;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-use App\Entity\InventoryItem;
+use App\Document\InventoryItem;
 
 class FileStorage
 {

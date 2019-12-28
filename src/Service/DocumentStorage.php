@@ -19,7 +19,7 @@ class DocumentStorage
     protected function init()
     {
         if (!$this->mongo) {
-            $this->mongo = new MongoDB(getenv('DATABASE_URL'));
+            $this->mongo = new MongoDB(getenv('MONGODB_URL'));
             // Create full text index if it doesn't already exist
             $inventory = $this->mongo->inventory->inventory;
             $exists = false;
@@ -38,7 +38,7 @@ class DocumentStorage
 
     /**
      * Get a reference to our inventory collection
-     * 
+     *
      * @return MongoDB\Collection
      */
     protected function getInventoryCollection() : \MongoDB\Collection
@@ -49,7 +49,7 @@ class DocumentStorage
 
     /**
      * Get a reference to our tag collection
-     * 
+     *
      * @return MongoDB\Collection
      */
     protected function getTagCollection() : \MongoDB\Collection
@@ -60,20 +60,20 @@ class DocumentStorage
 
     /**
      * Get inventory items
-     * 
+     *
      * @return MongoDB\Driver\Cursor
      */
     public function getInventoryItems() : iterable
     {
         return $this->getInventoryCollection()->find(
-            ['deleted' => false], 
+            ['deleted' => false],
             ['sort' => ['name' => 1]]
         );
     }
 
     /**
      * Get inventory items containing a string
-     * 
+     *
      * @return MongoDB\Driver\Cursor
      */
     public function searchInventoryItems(string $query) : iterable
@@ -86,7 +86,7 @@ class DocumentStorage
 
     /**
      * Get an inventory item
-     * 
+     *
      * @return App\Entity\InventoryItem
      */
     public function getInventoryItem(string $id) : ?InventoryItem
@@ -97,7 +97,7 @@ class DocumentStorage
 
     /**
      * Get inventory items by tag name
-     * 
+     *
      * @param string $category One of Tag::CATEGORY_*
      * @param string $tag Tag name
      * @return MongoDB\Driver\Cursor
@@ -111,14 +111,14 @@ class DocumentStorage
                     '$options' => 'i'
                 ],
                 'deleted' => false
-            ], 
+            ],
             ['sort' => ['name' => 1]]
         );
     }
 
     /**
      * Get one random inventory item by tag name
-     * 
+     *
      * @param string $category One of Tag::CATEGORY_*
      * @param string $tag Tag name
      * @return MongoDB\Driver\Cursor
@@ -136,7 +136,7 @@ class DocumentStorage
 
     /**
      * Persist an inventory item
-     * 
+     *
      * @return string The ID of the item
      */
     public function saveInventoryItem(InventoryItem $item) : string
@@ -161,13 +161,13 @@ class DocumentStorage
         );
         $this->saveInventoryItemTags(Tag::CATEGORY_ITEM_TYPE, $originalTypes, $item->getTypes());
         $this->saveInventoryItemTags(Tag::CATEGORY_ITEM_LOCATION, $originalLocations, $item->getLocations());
-    
+
         return (string) $item->getId();
     }
 
     /**
      * Save tag entities associated with an inventory item being updated
-     * 
+     *
      * @param string $category One of Tag::CATEGORY_*
      * @param string[] $originalTagStrings Tag strings associated with the item before update
      * @param string[] $updatedTagStrings Tag strings associated with the updated item
@@ -223,7 +223,7 @@ class DocumentStorage
 
     /**
      * Get tags, optionally by category
-     * 
+     *
      * @param string $category One of Tag::CATEGORY_*
      * @param string[] $orderBy Field to order by
      * @return MongoDB\Driver\Cursor
@@ -249,7 +249,7 @@ class DocumentStorage
 
     /**
      * Get "top" 5 tags by category
-     * 
+     *
      * @param string $category One of Tag::CATEGORY_*
      * @return MongoDB\Driver\Cursor
      */
@@ -265,7 +265,7 @@ class DocumentStorage
 
     /**
      * Get "top" 5 type tags
-     * 
+     *
      * @return MongoDB\Driver\Cursor
      */
     public function getTopTypeTags() : iterable
@@ -275,7 +275,7 @@ class DocumentStorage
 
     /**
      * Get "top" 5 location tags
-     * 
+     *
      * @return MongoDB\Driver\Cursor
      */
     public function getTopLocationTags() : iterable
@@ -285,7 +285,7 @@ class DocumentStorage
 
     /**
      * Get a Tag entity by name
-     * 
+     *
      * @param string $category One of Tag::CATEGORY_*
      * @param string $name
      * @return Tag|null
@@ -296,7 +296,7 @@ class DocumentStorage
         $collection = $this->getTagCollection();
         return $collection->findOne(
             [
-                'category' => $category, 
+                'category' => $category,
                 // Case insensitive indexed search
                 'name' => [
                     '$regex' => '^' . $name . '$',

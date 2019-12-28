@@ -5,7 +5,7 @@ namespace App\Service;
 use Gumlet\ImageResize;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-use App\Entity\InventoryItem;
+use App\Document\InventoryItem;
 
 class ImageStorage
 {
@@ -17,7 +17,7 @@ class ImageStorage
 
     /**
      * Constructor
-     * 
+     *
      * @param string $basePath See services.yaml
      */
     public function __construct(string $basePath)
@@ -32,7 +32,7 @@ class ImageStorage
 
     /**
      * Save images and their resized versions during upload.
-     * 
+     *
      * @param InventoryItem $item
      * @param UploadedFile[] $files
      */
@@ -62,7 +62,7 @@ class ImageStorage
 
     /**
      * Get image file names associated with an item. This returns only the unscaled files.
-     * 
+     *
      * @param InventoryItem $item
      * @return string[] Array of image file names (excluding path)
      */
@@ -82,13 +82,13 @@ class ImageStorage
                 }
             }
         }
-        
+
         return $images;
     }
 
     /**
      * Get the full path to an item image file. Generate scaled image as needed.
-     * 
+     *
      * @param InventoryItem $item
      * @param string $filename The file name of the unscaled image
      * @param int|null $width
@@ -118,7 +118,7 @@ class ImageStorage
 
     /**
      * Remove an item's image from storage
-     * 
+     *
      * @param InventoryItem $item
      * @param string $filename
      */
@@ -137,7 +137,7 @@ class ImageStorage
 
     /**
      * Resize an unscaled image to a width.
-     * 
+     *
      * @param InventoryItem $item
      * @param string $filename
      * @param int $width
@@ -154,7 +154,7 @@ class ImageStorage
 
     /**
      * Resize an unscaled image to a width and height. Image will be cropped to fit in the box.
-     * 
+     *
      * @param InventoryItem $item
      * @param string $filename
      * @param int $width

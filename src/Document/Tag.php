@@ -1,38 +1,50 @@
 <?php
 
-namespace App\Entity;
+namespace App\Document;
 
-class Tag extends Persistable
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use App\Repository\TagRepository;
+
+
+/**
+ * @MongoDB\Document(repositoryClass=TagRepository::class)
+ */
+class Tag
 {
     // Note these match item fields for convenience
     const CATEGORY_ITEM_LOCATION = 'locations';
     const CATEGORY_ITEM_TYPE = 'types';
 
-    /** @var string Tag type, one of TAG_CATEGORY_* */
+    /**
+     * @MongoDB\Id
+     */
+    protected $id;
+
+    /** @MongoDB\Field(type="string") */
     protected $category = self::CATEGORY_ITEM_TYPE;
 
-    /** @var string */
+    /** @MongoDB\Field(type="string") */
     protected $name = '';
 
-    /** @var int */
+    /** @MongoDB\Field(type="int") */
     protected $count = 0;
 
-    public function setCategory(string $category) 
+    public function setCategory(string $category)
     {
         $this->category = $category;
     }
 
-    public function getCategory() : string
+    public function getCategory(): string
     {
         return $this->category;
     }
 
-    public function setName(string $name) 
+    public function setName(string $name)
     {
         $this->name = $name;
     }
 
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -47,7 +59,7 @@ class Tag extends Persistable
         $this->count--;
     }
 
-    public function getCount() : int
+    public function getCount(): int
     {
         return $this->count;
     }

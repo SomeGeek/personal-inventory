@@ -15,42 +15,45 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-use App\Entity\InventoryItem;
-use App\Entity\Tag;
-use App\Service\DocumentStorage;
+use Doctrine\ODM\MongoDB\DocumentManager;
+
+use App\Document\InventoryItem;
+use App\Document\Tag;
 use App\Service\ImageStorage;
 use App\Service\FileStorage;
 use Symfony\Component\HttpFoundation\Response;
 
+use Psr\Log\LoggerInterface;
+
 class Inventory extends Controller
 {
-    /** @var DocumentStorage */
-    protected $docs;
-
     /** @var ImageStorage */
     protected $images;
 
     /** @var FileStorage */
     protected $files;
 
-    public function __construct(DocumentStorage $docs, ImageStorage $images, FileStorage $files)
+    public function __construct(DocumentManager $dm, ImageStorage $images, FileStorage $files, LoggerInterface $logger)
     {
-        $this->docs = $docs;
+        $this->dm = $dm;
+        $this->inventoryRepo = $this->dm->getRepository(InventoryItem::class);
+        $this->tagRepo = $this->dm->getRepository(Tag::class);
         $this->images = $images;
         $this->files = $files;
+        $this->logger = $logger;
     }
 
     public function listItems(Request $request, string $category = null, string $tag = null)
     {
         $breadcrumb = '';
         if ($category && $tag) {
-            $items = $this->docs->getInventoryItemsByTag($category, $tag);
+            $items = $this->inventoryRepo->findBy(['types' => $category]);
             $breadcrumb = $tag;
-        } elseif ($query = $request->query->get('q', '')) {
-            $items = $this->docs->searchInventoryItems($query);
-            $breadcrumb = $query;
+            // } elseif ($query = $request->query->get('q', '')) {
+            //     $items = $this->docs->searchInventoryItems($query);
+            //     $breadcrumb = $query;
         } else {
-            $items = $this->docs->getInventoryItems();
+            $items = $this->inventoryRepo->findAll();
         }
         return $this->render(
             'inventory/list.html.twig',
@@ -63,7 +66,8 @@ class Inventory extends Controller
 
     public function getItem($id)
     {
-        $item = $this->docs->getInventoryItem($id);
+        $item = $this->inventoryRepo->findOneBy(['id' => $id]);
+        #$item = $this->docs->getInventoryItem($id);
         if (!$item) {
             throw $this->createNotFoundException('Item not found');
         }
@@ -77,7 +81,8 @@ class Inventory extends Controller
     {
         $errors = [];
         if ($id) {
-            $item = $this->docs->getInventoryItem($id);
+            $item = $this->inventoryRepo->findOneBy(['id' => $id]);
+            #$item = $this->docs->getInventoryItem($id);
             if (!$item) {
                 throw $this->createNotFoundException('Item not found');
             }
@@ -93,7 +98,9 @@ class Inventory extends Controller
 
         // Handle delete
         if ($request->isMethod('POST') && $request->request->get('submit', 'submit') === 'delete') {
-            $this->docs->deleteInventoryItem($item);
+            $this->dm->remove($item);
+            $this->dm->flush();
+            //$this->docs->deleteInventoryItem($item);
             return $this->redirectToRoute('inventory_list');
         }
 
@@ -103,7 +110,12 @@ class Inventory extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $item = $form->getData();
             try {
-                $id = $this->docs->saveInventoryItem($item);
+                // Save tags
+                $this->saveTags(Tag::CATEGORY_ITEM_TYPE, $item->getTypes());
+                $this->saveTags(Tag::CATEGORY_ITEM_LOCATION, $item->getLocations());
+                $this->dm->persist($item);
+                $this->dm->flush();
+                $id = $item->getId();
                 $this->images->saveItemImages($item, $request->files->get('form')['images']);
                 $this->files->saveItemfiles($item, $request->files->get('form')['files']);
                 $this->deleteImages($request, $item);
@@ -191,7 +203,8 @@ class Inventory extends Controller
             ->add(
                 'notes',
                 TextareaType::class,
-                ['required' => false])
+                ['required' => false]
+            )
             ->add(
                 'images',
                 FileType::class,
@@ -232,7 +245,7 @@ class Inventory extends Controller
                 $tags = array_combine($formInput[$field], $formInput[$field]);
             }
         }
-        foreach ($this->docs->getTags($tagCategory) as $tag) {
+        foreach ($this->tagRepo->findBy(['category' => $tagCategory]) as $tag) {
             $tags[(string) $tag] = (string) $tag;
         }
         return $tags;
@@ -277,7 +290,8 @@ class Inventory extends Controller
      */
     public function image(Request $request, $id, $filename)
     {
-        $item = $this->docs->getInventoryItem($id);
+        $item = $this->inventoryRepo->findBy(['id' => $id]);
+        #$item = $this->docs->getInventoryItem($id);
         if (!$item) {
             throw $this->createNotFoundException('Item not found');
         }
@@ -300,7 +314,8 @@ class Inventory extends Controller
      */
     public function itemfile(Request $request, $id, $filename)
     {
-        $item = $this->docs->getInventoryItem($id);
+        $item = $this->inventoryRepo->findBy(['id' => $id]);
+        #$item = $this->docs->getInventoryItem($id);
         if (!$item) {
             throw $this->createNotFoundException('Item not found');
         }
@@ -313,6 +328,25 @@ class Inventory extends Controller
                 return new BinaryFileResponse($path, Response::HTTP_OK, ['Cache-Control' => 'max-age=14400']);
             } else {
                 throw $this->createNotFoundException('File not found');
+            }
+        }
+    }
+
+    protected function saveTags($category, $tagNames)
+    {
+        foreach ($tagNames as $tagName) {
+            $item = $this->tagRepo->findOneByCategory($category, $tagName);
+            //$this->logger->error($item);
+            if (!$item) {
+                $newTag = new Tag();
+                $newTag->setCategory($category);
+                $newTag->setName($tagName);
+                try {
+                    $this->dm->persist($newTag);
+                    $this->dm->flush();
+                } catch (\Exception $e) {
+                    $errors[] = $e->getMessage();
+                }
             }
         }
     }
