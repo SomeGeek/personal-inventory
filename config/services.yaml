@@ -28,3 +28,6 @@ services:
     # please note that last definitions always *replace* previous ones
     App\Service\ImageStorage:
         arguments: ['%kernel.project_dir%/data/images']
+
+    App\Service\FileStorage:
+        arguments: ['%kernel.project_dir%/data/files']

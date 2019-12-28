@@ -19,6 +19,7 @@ use App\Entity\InventoryItem;
 use App\Entity\Tag;
 use App\Service\DocumentStorage;
 use App\Service\ImageStorage;
+use App\Service\FileStorage;
 use Symfony\Component\HttpFoundation\Response;
 
 class Inventory extends Controller
@@ -29,10 +30,14 @@ class Inventory extends Controller
     /** @var ImageStorage */
     protected $images;
 
-    public function __construct(DocumentStorage $docs, ImageStorage $images)
+    /** @var FileStorage */
+    protected $files;
+
+    public function __construct(DocumentStorage $docs, ImageStorage $images, FileStorage $files)
     {
         $this->docs = $docs;
         $this->images = $images;
+        $this->files = $files;
     }
 
     public function listItems(Request $request, string $category = null, string $tag = null)
@@ -48,7 +53,7 @@ class Inventory extends Controller
             $items = $this->docs->getInventoryItems();
         }
         return $this->render(
-            'inventory/list.html.twig', 
+            'inventory/list.html.twig',
             [
                 'items' => $items,
                 'breadcrumb' => $breadcrumb
@@ -63,8 +68,8 @@ class Inventory extends Controller
             throw $this->createNotFoundException('Item not found');
         }
         return $this->render(
-            'inventory/view.html.twig', 
-            ['item' => $item, 'images' => $this->images->getItemImages($item)]
+            'inventory/view.html.twig',
+            ['item' => $item, 'images' => $this->images->getItemImages($item), 'files' => $this->files->getItemFiles($item)]
         );
     }
 
@@ -77,10 +82,12 @@ class Inventory extends Controller
                 throw $this->createNotFoundException('Item not found');
             }
             $images = $this->images->getItemImages($item);
+            $files = $this->files->getItemFiles($item);
             $mode = 'edit';
         } else {
             $item = new InventoryItem();
             $images = [];
+            $files = [];
             $mode = 'new';
         }
 
@@ -92,13 +99,15 @@ class Inventory extends Controller
 
         $form = $this->getItemForm($request, $item);
         $form->handleRequest($request);
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
             $item = $form->getData();
             try {
                 $id = $this->docs->saveInventoryItem($item);
                 $this->images->saveItemImages($item, $request->files->get('form')['images']);
+                $this->files->saveItemfiles($item, $request->files->get('form')['files']);
                 $this->deleteImages($request, $item);
+                $this->deleteFiles($request, $item);
             } catch (\Exception $e) {
                 $errors[] = $e->getMessage();
             }
@@ -114,12 +123,13 @@ class Inventory extends Controller
         }
 
         return $this->render(
-            'inventory/edit.html.twig', 
+            'inventory/edit.html.twig',
             [
-                'form' => $form->createView(), 
-                'mode' => $mode, 
+                'form' => $form->createView(),
+                'mode' => $mode,
                 'itemid' => $item->getId(),
                 'images' => $images,
+                'files' => $files,
                 'errors' => $errors
             ]
         );
@@ -142,14 +152,14 @@ class Inventory extends Controller
             ->add('model', TextType::class, ['required' => false])
             ->add('serialNumbers', TextareaType::class, ['required' => false])
             ->add(
-                'purchasePrice', 
-                MoneyType::class, 
+                'purchasePrice',
+                MoneyType::class,
                 // TODO: Make currency configurable
                 ['label' => 'Purchase price (per item)', 'required' => false, 'currency' => 'USD']
             )
             ->add(
-                'value', 
-                MoneyType::class, 
+                'value',
+                MoneyType::class,
                 // TODO: Make currency configurable
                 ['label' => 'Current value (per item)', 'required' => false, 'currency' => 'USD']
             )
@@ -170,27 +180,36 @@ class Inventory extends Controller
                 ] + $tagAttributes
             )
             ->add(
-                'acquiredDate', 
+                'acquiredDate',
                 DateType::class,
                 [
-                    'label' => 'Date Acquired', 
+                    'label' => 'Date Acquired',
                     'widget' => 'single_text',
                     'required' => false
                 ]
             )
             ->add(
-                'notes', 
+                'notes',
                 TextareaType::class,
                 ['required' => false])
             ->add(
                 'images',
                 FileType::class,
                 [
-                    'label' => 'Add Images', 
-                    'multiple' => true, 
-                    'mapped' => false, 
+                    'label' => 'Add Images',
+                    'multiple' => true,
+                    'mapped' => false,
                     'required' => false,
                     'attr' => ['accept' => 'image/*']
+                ]
+            )->add(
+                'files',
+                FileType::class,
+                [
+                    'label' => 'Add Files',
+                    'multiple' => true,
+                    'mapped' => false,
+                    'required' => false,
                 ]
             )
             ->getForm();
@@ -198,7 +217,7 @@ class Inventory extends Controller
 
     /**
      * Get tags, including any new tags POSTed through the form
-     * 
+     *
      * @param Request $request HTTP request
      * @param string $field Form and entity field name
      * @param string $tagCategory
@@ -221,7 +240,7 @@ class Inventory extends Controller
 
     /**
      * Delete images from form POST
-     * 
+     *
      * @param Request $request
      * @param InventoryItem $item
      */
@@ -236,8 +255,24 @@ class Inventory extends Controller
     }
 
     /**
+     * Delete files from form POST
+     *
+     * @param Request $request
+     * @param InventoryItem $item
+     */
+    private function deleteFiles(Request $request, InventoryItem $item)
+    {
+        $formInput = $request->request->get('delete_files');
+        if ($formInput) {
+            foreach ($formInput as $filename) {
+                $this->files->deleteItemFile($item, $filename);
+            }
+        }
+    }
+
+    /**
      * GET image content; POST to delete
-     * 
+     *
      * Query string parameters "w" and "h" can be used to get a scaled version. Original images will be scaled as needed.
      */
     public function image(Request $request, $id, $filename)

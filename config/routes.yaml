@@ -20,6 +20,9 @@ inventory_edit:
 inventory_image:
     path: /inventory/{id}/images/{filename}
     controller: App\Controller\Inventory::image
+inventory_file:
+    path: /inventory/{id}/files/{filename}
+    controller: App\Controller\Inventory::file
 
 tag_list:
     path: /tags/{category}
