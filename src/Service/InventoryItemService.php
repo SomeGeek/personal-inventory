@@ -23,7 +23,9 @@ class InventoryItemService
 
     public function getRandomInventoryItemByTag(string $category, string $tag)
     {
-        return $this->inventoryRepo->findOneRandomByCategoryAndTag($category, $tag);
+        $result = $this->findByCategoryAndTag($category, $tag)->toArray();
+        // TODO: Return a random result
+        return $result[0];
     }
 
     public function saveInventoryItem(InventoryItem $item, array $originalLocations = [], array $originalTypes = []): string

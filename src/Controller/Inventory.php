@@ -51,7 +51,7 @@ class Inventory extends AbstractController
     {
         $breadcrumb = '';
         if ($category && $tag) {
-            $items = $this->inventoryRepo->findByCategoryAndTag($category, $tag);
+            $items = $this->inventoryItemService->findByCategoryAndTag($category, $tag);
             $breadcrumb = $tag;
         } elseif ($query = $request->query->get('q', '')) {
             $items = $this->inventoryItemService->searchInventoryItems($query);
