@@ -21,6 +21,15 @@ class InventoryItemRepository extends ServiceDocumentRepository
             ->execute();
     }
 
+    public function findOneByCategoryAndTag(string $category, string $tag)
+    {
+        return $this->createQueryBuilder()
+            ->field($category)->equals($tag)
+            ->limit(1)
+            ->getQuery()
+            ->getSingleResult();
+    }
+
     public function search(string $query)
     {
         $qb = $this->createQueryBuilder()->text($query);

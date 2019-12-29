@@ -18,4 +18,9 @@ class InventoryItemService
     {
         return $this->inventoryRepo->search($query)->toArray();
     }
+
+    public function getRandomInventoryItemByTag(string $category, string $tag)
+    {
+        return $this->inventoryRepo->findOneByCategoryAndTag($category, $tag);
+    }
 }
