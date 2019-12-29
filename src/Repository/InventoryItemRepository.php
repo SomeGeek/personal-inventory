@@ -21,7 +21,7 @@ class InventoryItemRepository extends ServiceDocumentRepository
             ->execute();
     }
 
-    public function findOneByCategoryAndTag(string $category, string $tag)
+    public function findOneRandomByCategoryAndTag(string $category, string $tag)
     {
         return $this->createQueryBuilder()
             ->field($category)->equals($tag)
@@ -33,7 +33,6 @@ class InventoryItemRepository extends ServiceDocumentRepository
     public function search(string $query)
     {
         $qb = $this->createQueryBuilder()->text($query);
-        dump($qb);
         return $qb->getQuery()->execute();
 
         // $keywords = explode(' ', $query);

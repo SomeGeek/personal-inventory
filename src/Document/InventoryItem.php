@@ -287,4 +287,16 @@ class InventoryItem
     {
         return $this->deleted;
     }
+
+    /**
+     * Set modified time to now
+     */
+    public function setModifiedTime()
+    {
+        $this->modifiedTime = time();
+    }
+    public function getModifiedTime()
+    {
+        return new \DateTime('@' . $this->modifiedTime);
+    }
 }

@@ -90,6 +90,8 @@ class Inventory extends AbstractController
             }
             $images = $this->images->getItemImages($item);
             $files = $this->files->getItemFiles($item);
+            $originalLocations = $item->getLocations();
+            $originalTypes = $item->getTypes();
             $mode = 'edit';
         } else {
             $item = new InventoryItem();
@@ -101,7 +103,6 @@ class Inventory extends AbstractController
         // Handle delete
         if ($request->isMethod('POST') && $request->request->get('submit', 'submit') === 'delete') {
             $this->dm->remove($item);
-            $this->dm->flush();
             return $this->redirectToRoute('inventory_list');
         }
 
@@ -114,13 +115,12 @@ class Inventory extends AbstractController
                 // Save tags
                 $this->saveTags(Tag::CATEGORY_ITEM_TYPE, $item->getTypes());
                 $this->saveTags(Tag::CATEGORY_ITEM_LOCATION, $item->getLocations());
-                $this->dm->persist($item);
-                $this->dm->flush();
-                $id = $item->getId();
+                $id = $this->inventoryItemService->saveInventoryItem($item, $originalLocations, $originalTypes);
                 $this->images->saveItemImages($item, $request->files->get('form')['images']);
                 $this->files->saveItemfiles($item, $request->files->get('form')['files']);
                 $this->deleteImages($request, $item);
                 $this->deleteFiles($request, $item);
+                $this->dm->flush();
             } catch (\Exception $e) {
                 $errors[] = $e->getMessage();
             }
@@ -336,15 +336,13 @@ class Inventory extends AbstractController
     protected function saveTags($category, $tagNames)
     {
         foreach ($tagNames as $tagName) {
-            $item = $this->tagRepo->findOneByCategory($category, $tagName);
-            //$this->logger->error($item);
+            $item = $this->tagRepo->findOneByName($category, $tagName);
             if (!$item) {
                 $newTag = new Tag();
                 $newTag->setCategory($category);
                 $newTag->setName($tagName);
                 try {
                     $this->dm->persist($newTag);
-                    $this->dm->flush();
                 } catch (\Exception $e) {
                     $errors[] = $e->getMessage();
                 }
