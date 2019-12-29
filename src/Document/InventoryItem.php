@@ -6,7 +6,12 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use App\Repository\InventoryItemRepository;
 
 /**
- * @MongoDB\Document(repositoryClass=InventoryItemRepository::class)
+ * @MongoDB\Document(
+ *      repositoryClass=InventoryItemRepository::class,
+ *      indexes={
+ *          @MongoDB\Index(keys={"name"="text", "manufacturer"="text", "model"="text", "notes"="text"})
+ *      },
+ * )
  */
 class InventoryItem
 {

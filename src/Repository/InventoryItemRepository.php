@@ -20,4 +20,22 @@ class InventoryItemRepository extends ServiceDocumentRepository
             ->getQuery()
             ->execute();
     }
+
+    public function search(string $query)
+    {
+        $qb = $this->createQueryBuilder()->text($query);
+        dump($qb);
+        return $qb->getQuery()->execute();
+
+        // $keywords = explode(' ', $query);
+        // $qb->addOr($qb->expr()->field('name')->equals($keywords));
+        // $qb->addOr($qb->expr()->field('manufacturer')->equals($keywords));
+        // $qb->addOr($qb->expr()->field('name')->equals($keywords));
+        // $qb->addOr($qb->expr()->field('notes')->equals($keywords));
+
+        // return $qb->getQuery()->execute();
+
+        #->getQuery()->getResult();
+        //$qb->field(null)->equals($expr->getQuery());
+    }
 }

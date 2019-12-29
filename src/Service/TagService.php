@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Document\Tag;
+use App\Service\ImageStorage;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 

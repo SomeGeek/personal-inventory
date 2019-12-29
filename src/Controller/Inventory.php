@@ -21,9 +21,8 @@ use App\Document\InventoryItem;
 use App\Document\Tag;
 use App\Service\ImageStorage;
 use App\Service\FileStorage;
+use App\Service\InventoryItemService;
 use Symfony\Component\HttpFoundation\Response;
-
-use Psr\Log\LoggerInterface;
 
 class Inventory extends Controller
 {
@@ -33,14 +32,20 @@ class Inventory extends Controller
     /** @var FileStorage */
     protected $files;
 
-    public function __construct(DocumentManager $dm, ImageStorage $images, FileStorage $files, LoggerInterface $logger)
+    /** @var InventoryItemService */
+    protected $InventoryItemService;
+
+    public function __construct(DocumentManager $dm, ImageStorage $images, FileStorage $files, InventoryItemService $InventoryItemService)
     {
         $this->dm = $dm;
         $this->inventoryRepo = $this->dm->getRepository(InventoryItem::class);
         $this->tagRepo = $this->dm->getRepository(Tag::class);
         $this->images = $images;
         $this->files = $files;
-        $this->logger = $logger;
+        $this->inventoryItemService = $InventoryItemService;
+
+        // Create the schema and indexes in MongoDB
+        $this->dm->getSchemaManager()->ensureIndexes();
     }
 
     public function listItems(Request $request, string $category = null, string $tag = null)
@@ -49,9 +54,9 @@ class Inventory extends Controller
         if ($category && $tag) {
             $items = $this->inventoryRepo->findByCategoryAndTag($category, $tag);
             $breadcrumb = $tag;
-            // } elseif ($query = $request->query->get('q', '')) {
-            //     $items = $this->docs->searchInventoryItems($query);
-            //     $breadcrumb = $query;
+        } elseif ($query = $request->query->get('q', '')) {
+            $items = $this->inventoryItemService->searchInventoryItems($query);
+            $breadcrumb = $query;
         } else {
             $items = $this->inventoryRepo->findAll();
         }
@@ -67,7 +72,6 @@ class Inventory extends Controller
     public function getItem($id)
     {
         $item = $this->inventoryRepo->findOneBy(['id' => $id]);
-        #$item = $this->docs->getInventoryItem($id);
         if (!$item) {
             throw $this->createNotFoundException('Item not found');
         }
@@ -82,7 +86,6 @@ class Inventory extends Controller
         $errors = [];
         if ($id) {
             $item = $this->inventoryRepo->findOneBy(['id' => $id]);
-            #$item = $this->docs->getInventoryItem($id);
             if (!$item) {
                 throw $this->createNotFoundException('Item not found');
             }
@@ -100,7 +103,6 @@ class Inventory extends Controller
         if ($request->isMethod('POST') && $request->request->get('submit', 'submit') === 'delete') {
             $this->dm->remove($item);
             $this->dm->flush();
-            //$this->docs->deleteInventoryItem($item);
             return $this->redirectToRoute('inventory_list');
         }
 
