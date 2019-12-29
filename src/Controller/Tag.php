@@ -2,16 +2,15 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use App\Document\Tag as TagDocument;
-use App\Document\InventoryItem;
 
 use App\Service\InventoryItemService;
 use App\Service\ImageStorage;
 
-class Tag extends Controller
+class Tag extends AbstractController
 {
 
     /** @var ImageStorage */

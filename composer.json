@@ -3,6 +3,7 @@
     "description": "Personal inventory management system",
     "type": "project",
     "license": "MIT",
+    "version": "1.2.0",
     "require": {
         "php": "^7.2.0",
         "ext-iconv": "*",
@@ -35,8 +36,7 @@
         "symfony/dotenv": "^4.4",
         "symfony/maker-bundle": "^1.0",
         "symfony/profiler-pack": "*",
-        "symfony/test-pack": "^1.0",
-        "symfony/web-server-bundle": "^4.4"
+        "symfony/test-pack": "^1.0"
     },
     "config": {
         "preferred-install": {
