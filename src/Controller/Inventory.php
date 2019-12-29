@@ -290,7 +290,7 @@ class Inventory extends Controller
      */
     public function image(Request $request, $id, $filename)
     {
-        $item = $this->inventoryRepo->findBy(['id' => $id]);
+        $item = $this->inventoryRepo->findOneBy(['id' => $id]);
         #$item = $this->docs->getInventoryItem($id);
         if (!$item) {
             throw $this->createNotFoundException('Item not found');
@@ -314,7 +314,7 @@ class Inventory extends Controller
      */
     public function itemfile(Request $request, $id, $filename)
     {
-        $item = $this->inventoryRepo->findBy(['id' => $id]);
+        $item = $this->inventoryRepo->findOneBy(['id' => $id]);
         #$item = $this->docs->getInventoryItem($id);
         if (!$item) {
             throw $this->createNotFoundException('Item not found');
