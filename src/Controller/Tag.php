@@ -30,7 +30,7 @@ class Tag extends Controller
      */
     public function listTags(string $category)
     {
-        $tags = $this->tagRepo->findAllByCategory($category);
+        $tags = $this->tagRepo->findAllByCategory($category)->toArray();
         $images = [];
         // foreach ($tags as $tag) {
         //     // Get a random image associated with the tag

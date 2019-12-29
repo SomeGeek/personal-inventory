@@ -8,7 +8,7 @@
 
             <div class="card m-2">
                 <a href="{{ path('inventory_list_by_tag', {'category': tag.category, 'tag': tag.name}) }}">
-                    {% if images[tag.name] %}
+                    {% if tag.name in images|keys %}
                         <img class="card-img-top" src="{{ path('inventory_image', {'id': images[tag.name]['itemid'], 'filename': images[tag.name]['filename']}) }}?w=200&h=200" alt="{{ tag.name }}">
                     {% else %}
                         <div class="card-img-top no-image"></div>
