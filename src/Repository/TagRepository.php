@@ -13,7 +13,7 @@ class TagRepository extends ServiceDocumentRepository
         parent::__construct($registry, Tag::class);
     }
 
-    public function findAllByCategory($category)
+    public function findAllByCategory(string $category)
     {
         return $this->createQueryBuilder()
             ->field('category')->equals($category)

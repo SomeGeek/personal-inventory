@@ -12,4 +12,12 @@ class InventoryItemRepository extends ServiceDocumentRepository
     {
         parent::__construct($registry, InventoryItem::class);
     }
+
+    public function findByCategoryAndTag(string $category, string $tag)
+    {
+        return $this->createQueryBuilder()
+            ->field($category)->equals($tag)
+            ->getQuery()
+            ->execute();
+    }
 }

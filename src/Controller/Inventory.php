@@ -47,7 +47,7 @@ class Inventory extends Controller
     {
         $breadcrumb = '';
         if ($category && $tag) {
-            $items = $this->inventoryRepo->findBy(['types' => $category]);
+            $items = $this->inventoryRepo->findByCategoryAndTag($category, $tag);
             $breadcrumb = $tag;
             // } elseif ($query = $request->query->get('q', '')) {
             //     $items = $this->docs->searchInventoryItems($query);
