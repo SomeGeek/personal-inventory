@@ -62,9 +62,13 @@
                 <tr>
                     <th scope="row">Files</th>
                     <td>
-                        {% for filename in files %}
-                            <a href="{{ path('inventory_file', {'id': item.id, 'filename': filename}) }}">{{ filename }}</a>
-                        {% endfor %}
+                        <div class="list-group" style="min-width:200px;display:inline-block">
+                            {% for filename in files %}
+                                <a href="{{ path('inventory_file', {'id': item.id, 'filename': filename}) }}" class="list-group-item list-group-item-action">
+                                    {{ filename }}
+                                </a>
+                            {% endfor %}
+                        </div>
                     </td>
                 </tr>
             {% endif %}
