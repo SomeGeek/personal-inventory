@@ -21,11 +21,15 @@ class InventoryItemService
         return $this->inventoryRepo->search($query)->toArray();
     }
 
-    public function getRandomInventoryItemByTag(string $category, string $tag)
+    public function getRandomInventoryItemByTag(string $category, string $tag) : ?InventoryItem
     {
         $result = $this->findByCategoryAndTag($category, $tag)->toArray();
-        // TODO: Return a random result
-        return $result[0];
+        if ($result) {
+            $index = mt_rand(0, count($result));
+            return $result[$index];
+        } else {
+            return null;
+        }
     }
 
     public function getAll(){
