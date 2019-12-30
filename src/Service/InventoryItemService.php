@@ -21,7 +21,7 @@ class InventoryItemService
         return $this->inventoryRepo->search($query)->toArray();
     }
 
-    public function getRandomInventoryItemByTag(string $category, string $tag) : ?InventoryItem
+    public function getRandomInventoryItemByTag(string $category, string $tag): ?InventoryItem
     {
         $result = $this->findByCategoryAndTag($category, $tag)->toArray();
         if ($result) {
@@ -32,7 +32,8 @@ class InventoryItemService
         }
     }
 
-    public function getAll(){
+    public function getAll()
+    {
         return $this->inventoryRepo->getAll()->toArray();
     }
 
@@ -76,7 +77,7 @@ class InventoryItemService
         $this->saveInventoryItemTags(Tag::CATEGORY_ITEM_LOCATION, $item->getLocations(), []);
     }
 
-    public function findByCategoryAndTag(string $category, string $tag) : iterable
+    public function findByCategoryAndTag(string $category, string $tag): iterable
     {
         return $this->inventoryRepo->findByCategoryAndTag($category, $tag);
     }

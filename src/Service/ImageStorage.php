@@ -66,7 +66,7 @@ class ImageStorage
      * @param InventoryItem $item
      * @return string[] Array of image file names (excluding path)
      */
-    public function getItemImages(InventoryItem $item) : array
+    public function getItemImages(InventoryItem $item): array
     {
         $images = [];
         $path = $this->getItemImagePath($item);

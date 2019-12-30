@@ -25,7 +25,7 @@ class TagRepository extends ServiceDocumentRepository
             ->execute();
     }
 
-    public function findOneByName(string $category, string $tagName) : ?Tag
+    public function findOneByName(string $category, string $tagName): ?Tag
     {
         $item = $this->createQueryBuilder()
             ->field('category')->equals($category)
