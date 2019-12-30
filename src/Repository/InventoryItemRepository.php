@@ -17,33 +17,24 @@ class InventoryItemRepository extends ServiceDocumentRepository
     {
         return $this->createQueryBuilder()
             ->field($category)->equals($tag)
+            ->field('deleted')->equals(false)
             ->getQuery()
             ->execute();
     }
 
-    public function findOneRandomByCategoryAndTag(string $category, string $tag)
+    public function getAll()
     {
         return $this->createQueryBuilder()
-            ->field($category)->equals($tag)
-            ->limit(1)
+            ->field('deleted')->equals(false)
             ->getQuery()
-            ->getSingleResult();
+            ->execute();
     }
 
     public function search(string $query)
     {
-        $qb = $this->createQueryBuilder()->text($query);
+        $qb = $this->createQueryBuilder()
+            ->field('deleted')->equals(false)
+            ->text($query);
         return $qb->getQuery()->execute();
-
-        // $keywords = explode(' ', $query);
-        // $qb->addOr($qb->expr()->field('name')->equals($keywords));
-        // $qb->addOr($qb->expr()->field('manufacturer')->equals($keywords));
-        // $qb->addOr($qb->expr()->field('name')->equals($keywords));
-        // $qb->addOr($qb->expr()->field('notes')->equals($keywords));
-
-        // return $qb->getQuery()->execute();
-
-        #->getQuery()->getResult();
-        //$qb->field(null)->equals($expr->getQuery());
     }
 }

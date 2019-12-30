@@ -57,7 +57,7 @@ class Inventory extends AbstractController
             $items = $this->inventoryItemService->searchInventoryItems($query);
             $breadcrumb = $query;
         } else {
-            $items = $this->inventoryRepo->findAll();
+            $items = $this->inventoryItemService->getAll();
         }
         return $this->render(
             'inventory/list.html.twig',
@@ -102,7 +102,8 @@ class Inventory extends AbstractController
 
         // Handle delete
         if ($request->isMethod('POST') && $request->request->get('submit', 'submit') === 'delete') {
-            $this->dm->remove($item);
+            $this->inventoryItemService->deleteInventoryItem($item);
+            $this->dm->flush();
             return $this->redirectToRoute('inventory_list');
         }
 

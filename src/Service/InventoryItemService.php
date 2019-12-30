@@ -28,6 +28,10 @@ class InventoryItemService
         return $result[0];
     }
 
+    public function getAll(){
+        return $this->inventoryRepo->getAll()->toArray();
+    }
+
     public function saveInventoryItem(InventoryItem $item, array $originalLocations = [], array $originalTypes = []): string
     {
         if (!$item) {
@@ -56,5 +60,20 @@ class InventoryItemService
             }
             $tag->incrementCount();
         }
+    }
+
+    public function deleteInventoryItem(InventoryItem $item)
+    {
+        if (!$item) {
+            throw new \RuntimeException('Empty item can not be deleted');
+        }
+        $item->setDeleted(true);
+        $this->saveInventoryItemTags(Tag::CATEGORY_ITEM_TYPE, $item->getTypes(), []);
+        $this->saveInventoryItemTags(Tag::CATEGORY_ITEM_LOCATION, $item->getLocations(), []);
+    }
+
+    public function findByCategoryAndTag(string $category, string $tag) : iterable
+    {
+        return $this->inventoryRepo->findByCategoryAndTag($category, $tag);
     }
 }
