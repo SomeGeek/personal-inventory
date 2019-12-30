@@ -16,8 +16,10 @@
     <table class="table table-striped table-hover">
         <thead>
             <tr>
-                <th scope="col"></th>
-                <th scope="col" class="text-right d-none d-md-table-cell">Location</th>
+                <th scope="col" style="width:6rem">Name</th>
+                <th scope="col" class="d-none d-md-table-cell" style="width:6rem">Manufacturer</th>
+                <th scope="col" class="d-none d-sm-table-cell">Model</th>
+                <th scope="col" class="text-right d-none d-lg-table-cell">Location</th>
                 <th scope="col" class="text-right" style="width:4rem">Qty</th>
                 <th scope="col" class="text-right" style="width:10rem">Est. Value</th>
             </tr>
@@ -31,26 +33,30 @@
                     <td>
                         <a href="{{ path('inventory_get', {'id': item.id}) }}">{{ item.name }}</a>
                     </td>
-                    <td class="text-right d-none d-md-table-cell">
+                    <td class="d-none d-md-table-cell">{{ item.manufacturer }}</td>
+                    <td class="d-none d-sm-table-cell">{{ item.model }}</td>
+                    <td class="text-right d-none d-lg-table-cell">
                         {{ macros.tags('locations', item.locations) }}
                     </td>
                     <td class="text-right">{{ item.quantity }}</td>
-                    <td class="text-right">{{ item.totalValue|localizedcurrency('USD') }}
+                    <td class="text-right">{{ item.totalValue|localizedcurrency('NZD') }}
                 </tr>
                 {% set total_quantity = total_quantity + item.quantity %}
                 {% set total_value = total_value + item.totalValue %}
             {% else %}
                 <tr>
-                    <td colspan="4">No items. Would you like to <a href="{{ path('inventory_add') }}">add one</a>?</td>
+                    <td colspan="6">No items. Would you like to <a href="{{ path('inventory_add') }}">add one</a>?</td>
                 </tr>
             {% endfor %}
-            
+
             <tfoot>
                 <tr>
                     <td><a class="btn btn-primary" href="{{ path('inventory_add') }}?return_to=list">Add</a></td>
                     <th scope="col" class="d-none d-md-table-cell"></th>
+                    <th scope="col" class="d-none d-sm-table-cell"></th>
+                    <th scope="col" class="d-none d-lg-table-cell"></th>
                     <th scope="col" class="text-right">{% if total_quantity %}{{ total_quantity }}{% endif %}</th>
-                    <th scope="col" class="text-right">{% if total_value %}{{ total_value|localizedcurrency('USD') }}{% endif %}</td>
+                    <th scope="col" class="text-right">{% if total_value %}{{ total_value|localizedcurrency('NZD') }}{% endif %}</td>
                 </tr>
             </tfoot>
         </tbody>
