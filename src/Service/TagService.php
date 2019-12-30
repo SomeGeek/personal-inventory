@@ -24,8 +24,8 @@ class TagService
      */
     public function getTopTags(string $category): iterable
     {
-        $collection = $this->tagRepo->findAllByCategory($category)->toArray();
-        // TODO: Filter and sort for top 5 tags
-        return $collection;
+        $tags = $this->tagRepo->findAllByCategory($category)->toArray();
+        $top5tags = array_slice($tags, 0, 5);
+        return $top5tags;
     }
 }
