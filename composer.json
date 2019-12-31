@@ -66,8 +66,7 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "post-install-cmd": [
-            "@auto-scripts",
-            "./bin/download_frontend_assets.sh"
+            "@auto-scripts"
         ],
         "post-update-cmd": [
             "@auto-scripts"

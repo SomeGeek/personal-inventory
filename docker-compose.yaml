@@ -1,14 +1,22 @@
 version: '3'
 services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    volumes:
+      - app:/app
+
   web:
     build:
       context: .
       dockerfile: docker/web/Dockerfile
-    image: personal-inventory
+    restart: unless-stopped
     ports:
-      - 8080:80
+      - 8080:8080
     volumes:
-      - data:/var/www/app/data
+      - app:/app
+      - data:/app/data
 
   mongodb:
     image: mongo:4
@@ -18,5 +26,6 @@ services:
       - mongodb:/data/db
 
 volumes:
+  app:
   data:
   mongodb:

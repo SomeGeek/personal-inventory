@@ -1,2 +1,6 @@
+.dockerignore
+.gitignore
 .git
 /screenshots
+/var
+/vendor
