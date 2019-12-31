@@ -97,6 +97,8 @@ class Inventory extends AbstractController
             $item = new InventoryItem();
             $images = [];
             $files = [];
+            $originalLocations = [];
+            $originalTypes = [];
             $mode = 'new';
         }
 
