@@ -46,7 +46,12 @@ class FileStorage
             }
             $extension = $file->guessExtension();
             if (!$extension) {
-                $extension = 'bin';
+                $originalExtension = $file->getClientOriginalExtension();
+                if ($originalExtension) {
+                    $extension = \transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalExtension);
+                } else {
+                    $extension = 'bin';
+                }
             }
             $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             $safeFilename = \transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);

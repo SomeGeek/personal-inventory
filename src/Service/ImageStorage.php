@@ -50,7 +50,12 @@ class ImageStorage
             }
             $extension = $file->guessExtension();
             if (!$extension) {
-                $extension = 'bin';
+                $originalExtension = $file->getClientOriginalExtension();
+                if ($originalExtension) {
+                    $extension = \transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalExtension);
+                } else {
+                    $extension = 'bin';
+                }
             }
             $originalFilename = $time . 'i' . $count . '.' . $extension;
             $file->move($itemPath, $originalFilename);
