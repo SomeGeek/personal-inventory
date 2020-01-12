@@ -25,7 +25,7 @@ class InventoryItemService
     {
         $result = $this->findByCategoryAndTag($category, $tag)->toArray();
         if ($result) {
-            $index = mt_rand(0, count($result));
+            $index = mt_rand(0, (count($result) - 1));
             return $result[$index];
         } else {
             return null;
