@@ -42,6 +42,9 @@ class InventoryItem
     /** @MongoDB\Field(type="collection") */
     protected $types = [];
 
+    /** @MongoDB\Field(type="collection") */
+    protected $states = [];
+
     /** @MongoDB\Field(type="string") */
     protected $purchasePrice;
 
@@ -182,6 +185,42 @@ class InventoryItem
     public function getTypes(): array
     {
         return $this->types;
+    }
+
+        /**
+     * Add one type to the set of states
+     *
+     * @param string $type
+     */
+    public function addState(string $state)
+    {
+        $this->states[] = $state;
+    }
+
+    /**
+     * Set all states for this item
+     *
+     * @param string[] $states
+     * @throws \RuntimeException
+     */
+    public function setStates(array $states)
+    {
+        foreach ($states as $state) {
+            if (is_object($state)) {
+                $state = (string) $state;
+            }
+        }
+        $this->states = $states;
+    }
+
+    /**
+     * Get all states (as strings) associated with this item
+     *
+     * @return string[]
+     */
+    public function getStates(): array
+    {
+        return $this->states;
     }
 
     /**

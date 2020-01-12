@@ -92,6 +92,7 @@ class Inventory extends AbstractController
             $files = $this->files->getItemFiles($item);
             $originalLocations = $item->getLocations();
             $originalTypes = $item->getTypes();
+            $originalStates = $item->getStates();
             $mode = 'edit';
         } else {
             $item = new InventoryItem();
@@ -99,6 +100,7 @@ class Inventory extends AbstractController
             $files = [];
             $originalLocations = [];
             $originalTypes = [];
+            $originalStates = [];
             $mode = 'new';
         }
 
@@ -118,7 +120,8 @@ class Inventory extends AbstractController
                 // Save tags
                 $this->saveTags(Tag::CATEGORY_ITEM_TYPE, $item->getTypes());
                 $this->saveTags(Tag::CATEGORY_ITEM_LOCATION, $item->getLocations());
-                $id = $this->inventoryItemService->saveInventoryItem($item, $originalLocations, $originalTypes);
+                $this->saveTags(Tag::CATEGORY_ITEM_STATE, $item->getStates());
+                $id = $this->inventoryItemService->saveInventoryItem($item, $originalLocations, $originalTypes, $originalStates);
                 $this->images->saveItemImages($item, $request->files->get('form')['images']);
                 $this->files->saveItemfiles($item, $request->files->get('form')['files']);
                 $this->deleteImages($request, $item);
@@ -193,6 +196,14 @@ class Inventory extends AbstractController
                 [
                     'label' => 'Location(s)',
                     'choices' => $this->getTags($request, 'locations', Tag::CATEGORY_ITEM_LOCATION),
+                ] + $tagAttributes
+            )
+            ->add(
+                'states',
+                ChoiceType::class,
+                [
+                    'label' => 'State(s)',
+                    'choices' => $this->getTags($request, 'states', Tag::CATEGORY_ITEM_STATE),
                 ] + $tagAttributes
             )
             ->add(

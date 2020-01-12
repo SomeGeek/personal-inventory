@@ -37,7 +37,7 @@ class InventoryItemService
         return $this->inventoryRepo->getAll()->toArray();
     }
 
-    public function saveInventoryItem(InventoryItem $item, array $originalLocations = [], array $originalTypes = []): string
+    public function saveInventoryItem(InventoryItem $item, array $originalLocations = [], array $originalTypes = [], array $originalStates = []): string
     {
         if (!$item) {
             throw new \RuntimeException('Empty item can not be saved');
@@ -45,6 +45,7 @@ class InventoryItemService
         $item->setModifiedTime();
         $this->saveInventoryItemTags(Tag::CATEGORY_ITEM_TYPE, $originalTypes, $item->getTypes());
         $this->saveInventoryItemTags(Tag::CATEGORY_ITEM_LOCATION, $originalLocations, $item->getLocations());
+        $this->saveInventoryItemTags(Tag::CATEGORY_ITEM_STATE, $originalStates, $item->getStates());
         $this->dm->persist($item);
         return (string) $item->getId();
     }
@@ -75,6 +76,7 @@ class InventoryItemService
         $item->setDeleted(true);
         $this->saveInventoryItemTags(Tag::CATEGORY_ITEM_TYPE, $item->getTypes(), []);
         $this->saveInventoryItemTags(Tag::CATEGORY_ITEM_LOCATION, $item->getLocations(), []);
+        $this->saveInventoryItemTags(Tag::CATEGORY_ITEM_STATE, $item->getStates(), []);
     }
 
     public function findByCategoryAndTag(string $category, string $tag): iterable

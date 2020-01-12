@@ -41,6 +41,7 @@
             {% endif %}
             {{ table.tagrow('Types / Tags', 'types', item.types) }}
             {{ table.tagrow('Location(s)', 'locations', item.locations) }}
+            {{ table.tagrow('State(s)', 'states', item.states) }}
             {% if item.acquiredDate %}
                 {{ table.scalarrow('Acquired', item.acquiredDate|date("m/d/Y")) }}  {# TODO: Localize date format #}
             {% endif %}

@@ -14,6 +14,7 @@ class Tag
     // Note these match item fields for convenience
     const CATEGORY_ITEM_LOCATION = 'locations';
     const CATEGORY_ITEM_TYPE = 'types';
+    const CATEGORY_ITEM_STATE = 'states';
 
     /**
      * @MongoDB\Id
